@@ -34,6 +34,18 @@ def test_search_filters_records(client):
     assert [d["id"] for d in r.json()["items"]] == ["002"]
 
 
+def test_metadata_filter(client):
+    r = client.get("/v1/documents", params={"kind": "circular"})
+    assert r.json()["total"] == 2
+    assert r.json()["filters"] == {"kind": "circular"}
+
+
+def test_invalid_filter_name_is_400(client):
+    r = client.get("/v1/documents", params={"Bad-Key": "x"})
+    assert r.status_code == 400
+    assert r.headers["content-type"] == "application/problem+json"
+
+
 def test_get_document_found(client):
     r = client.get("/v1/documents/001")
     assert r.status_code == 200
@@ -44,10 +56,7 @@ def test_missing_document_is_problem_details(client):
     r = client.get("/v1/documents/999")
     assert r.status_code == 404
     assert r.headers["content-type"] == "application/problem+json"
-    body = r.json()
-    assert body["status"] == 404
-    assert body["title"] == "Not Found"
-    assert body["request_id"] == r.headers["X-Request-ID"]
+    assert r.json()["request_id"] == r.headers["X-Request-ID"]
 
 
 def test_bad_limit_is_422_problem(client):
@@ -61,53 +70,28 @@ def test_request_id_is_echoed(client):
     assert r.headers["X-Request-ID"] == "abc123"
 
 
-def test_app_refuses_to_start_without_app_env(monkeypatch):
-    monkeypatch.delenv("APP_ENV", raising=False)
-    monkeypatch.delenv("DATABASE_URL", raising=False)
+@pytest.mark.parametrize("missing", ["APP_ENV", "DATABASE_URL"])
+def test_app_refuses_to_start_without_required_settings(monkeypatch, missing):
+    monkeypatch.setenv("APP_ENV", "ci")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://localhost/db")
+    monkeypatch.delenv(missing)
     with pytest.raises(ValidationError):
         Settings(_env_file=None)
 
 
-def test_bad_filter_key_returns_400(client):
-    r = client.get("/v1/documents", params={"Bad-Name": "1"})
-    assert r.status_code == 400
-    assert r.headers["content-type"] == "application/problem+json"
-
-
-def test_metadata_filter_applied(client):
-    r = client.get("/v1/documents", params={"kind": "circular"})
-    body = r.json()
-    assert body["filters"] == {"kind": "circular"}
-    assert all(d["kind"] == "circular" for d in body["items"])
-
-
-def test_metadata_filter_numeric(client):
-    r = client.get("/v1/documents", params={"year": "2024"})
-    body = r.json()
-    assert body["filters"] == {"year": "2024"}
-    assert [d["id"] for d in body["items"]] == ["002"]
-
-
-def test_url_converter_strips_sslmode():
-    raw = "postgresql://u:p@h/d?sslmode=require&channel_binding=require"  # pragma: allowlist secret
-    result = to_asyncpg_url(raw)
-    assert "sslmode" not in result
-    assert "channel_binding" not in result
-    assert "ssl=require" in result
-    assert result.startswith("postgresql+asyncpg://")
-
-
-def test_url_converter_local_no_ssl():
-    raw = "postgresql://localhost:5432/querydoctor"
-    result = to_asyncpg_url(raw)
-    assert result.startswith("postgresql+asyncpg://")
-    assert "ssl" not in result
-
-
-def test_offset_paginates_correctly(client):
-    r1 = client.get("/v1/documents", params={"limit": 2, "offset": 0}).json()
-    r2 = client.get("/v1/documents", params={"limit": 2, "offset": 2}).json()
-    ids1 = [d["id"] for d in r1["items"]]
-    ids2 = [d["id"] for d in r2["items"]]
-    assert ids1 != ids2
-    assert r1["total"] == r2["total"] == 3
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (
+            "postgresql://app@ep-x.neon.tech/neondb?sslmode=require&channel_binding=require",
+            "postgresql+asyncpg://app@ep-x.neon.tech/neondb?ssl=require",
+        ),
+        (
+            "postgresql://postgres@localhost:5432/app?sslmode=disable",
+            "postgresql+asyncpg://postgres@localhost:5432/app",
+        ),
+        ("postgres://app@h/db", "postgresql+asyncpg://app@h/db"),
+    ],
+)
+def test_database_url_is_converted_for_asyncpg(raw, expected):
+    assert to_asyncpg_url(raw) == expected

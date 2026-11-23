@@ -1,80 +1,54 @@
+"""Runs against a REAL Postgres. Skipped unless TEST_DATABASE_URL is set.
+
+Use an empty database you don't mind wiping, e.g. a second Neon database "test".
+"""
+
 import asyncio
 import os
-import uuid
 
 import pytest
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from fastapi.testclient import TestClient
 
-from querydoctor.db.models import Document
-from querydoctor.db.repository import DocumentRepository
-from querydoctor.db.url import to_asyncpg_url
+from querydoctor.api.main import create_app
+from querydoctor.config import Settings
+from querydoctor.db.models import Base, Document
+from querydoctor.db.session import make_engine, make_sessionmaker
 
-TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
-pytestmark = pytest.mark.skipif(not TEST_DATABASE_URL, reason="TEST_DATABASE_URL not set")
-
-
-def test_db_connection():
-    async def _test():
-        engine = create_async_engine(to_asyncpg_url(TEST_DATABASE_URL))
-        async with engine.connect() as conn:
-            result = await conn.scalar(text("SELECT 1"))
-            assert result == 1
-        await engine.dispose()
-
-    asyncio.run(_test())
+TEST_URL = os.getenv("TEST_DATABASE_URL")
+pytestmark = pytest.mark.skipif(not TEST_URL, reason="set TEST_DATABASE_URL to run")
 
 
-def test_repo_insert_and_get():
-    async def _test():
-        engine = create_async_engine(to_asyncpg_url(TEST_DATABASE_URL))
-        session_factory = async_sessionmaker(engine, expire_on_commit=False)
-        ext_id = f"test_{uuid.uuid4().hex[:8]}"
-        async with session_factory() as session, session.begin():
-            doc = Document(
-                external_id=ext_id,
-                title="Integration Test Document",
-                doc_type="test",
-                sha256="fake_sha256",
-                metadata_={"tag": "integration", "number": 42},
-            )
-            session.add(doc)
-
-        async with session_factory() as session:
-            repo = DocumentRepository(session)
-            fetched = await repo.get(ext_id)
-            assert fetched is not None
-            assert fetched["id"] == ext_id
-            assert fetched["title"] == "Integration Test Document"
-            assert fetched["tag"] == "integration"
-        await engine.dispose()
-
-    asyncio.run(_test())
+async def _reset_and_seed(settings: Settings) -> None:
+    engine = make_engine(settings)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    async with make_sessionmaker(engine)() as session, session.begin():
+        session.add_all(
+            [
+                Document(external_id="001", title="Alpha", sha256="a" * 64, metadata_={"k": "x"}),
+                Document(external_id="002", title="Beta", sha256="b" * 64, metadata_={"k": "y"}),
+            ]
+        )
+    await engine.dispose()
 
 
-def test_repo_metadata_filter():
-    async def _test():
-        engine = create_async_engine(to_asyncpg_url(TEST_DATABASE_URL))
-        session_factory = async_sessionmaker(engine, expire_on_commit=False)
-        ext_id = f"test_{uuid.uuid4().hex[:8]}"
-        unique_tag = f"tag_{uuid.uuid4().hex[:6]}"
-        async with session_factory() as session, session.begin():
-            doc = Document(
-                external_id=ext_id,
-                title="Filter Test Document",
-                doc_type="test",
-                sha256="fake_sha256_2",
-                metadata_={"unique_tag": unique_tag},
-            )
-            session.add(doc)
+@pytest.fixture(scope="module")
+def db_client():
+    settings = Settings(app_env="ci", database_url=TEST_URL, _env_file=None)
+    asyncio.run(_reset_and_seed(settings))
+    with TestClient(create_app(settings)) as c:
+        yield c
 
-        async with session_factory() as session:
-            repo = DocumentRepository(session)
-            total, items = await repo.list(
-                q=None, filters={"unique_tag": unique_tag}, limit=10, offset=0
-            )
-            assert total >= 1
-            assert any(item["id"] == ext_id for item in items)
-        await engine.dispose()
 
-    asyncio.run(_test())
+def test_ready_with_real_database(db_client):
+    assert db_client.get("/ready").json()["checks"]["database"] is True
+
+
+def test_filter_uses_jsonb_containment(db_client):
+    body = db_client.get("/v1/documents", params={"k": "y"}).json()
+    assert [d["id"] for d in body["items"]] == ["002"]
+
+
+def test_get_from_real_database(db_client):
+    assert db_client.get("/v1/documents/001").json()["title"] == "Alpha"
