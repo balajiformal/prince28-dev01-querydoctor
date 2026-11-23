@@ -4,9 +4,11 @@
     "page": "using-explain.html",
     "chapter": "Performance Tips",
     "version": "16",
-    "topic": "EXPLAIN Basics and Cost Estimation",
+    "topic": "EXPLAIN Basics, Cost Estimation and Execution Plans",
     "sql_command": "EXPLAIN ANALYZE",
-    "config_param": null
+    "config_param": null,
+    "source_url": "https://www.postgresql.org/docs/16/using-explain.html",
+    "doc_type": "record"
   },
   {
     "id": "002",
@@ -15,7 +17,9 @@
     "version": "16",
     "topic": "Memory Consumption and Sort Operations",
     "sql_command": null,
-    "config_param": "work_mem"
+    "config_param": "work_mem",
+    "source_url": "https://www.postgresql.org/docs/16/runtime-config-resource.html",
+    "doc_type": "record"
   },
   {
     "id": "003",
@@ -24,7 +28,9 @@
     "version": "15",
     "topic": "Shared Buffer Pool Sizing",
     "sql_command": null,
-    "config_param": "shared_buffers"
+    "config_param": "shared_buffers",
+    "source_url": "https://www.postgresql.org/docs/15/runtime-config-resource.html",
+    "doc_type": "record"
   },
   {
     "id": "004",
@@ -33,7 +39,9 @@
     "version": "14",
     "topic": "Preventing Table Bloat and Transaction ID Wraparound",
     "sql_command": "VACUUM (VERBOSE, ANALYZE)",
-    "config_param": "autovacuum_vacuum_scale_factor"
+    "config_param": "autovacuum_vacuum_scale_factor",
+    "source_url": "https://www.postgresql.org/docs/14/routine-vacuuming.html",
+    "doc_type": "record"
   },
   {
     "id": "005",
@@ -42,7 +50,9 @@
     "version": "15",
     "topic": "B-Tree Index for Equality and Range Queries",
     "sql_command": "CREATE INDEX",
-    "config_param": null
+    "config_param": null,
+    "source_url": "https://www.postgresql.org/docs/15/indexes-types.html",
+    "doc_type": "record"
   },
   {
     "id": "006",
@@ -51,7 +61,9 @@
     "version": "16",
     "topic": "BRIN Indexes for Naturally Ordered Large Datasets",
     "sql_command": "CREATE INDEX USING brin",
-    "config_param": null
+    "config_param": null,
+    "source_url": "https://www.postgresql.org/docs/16/indexes-types.html",
+    "doc_type": "record"
   },
   {
     "id": "007",
@@ -60,7 +72,9 @@
     "version": "15",
     "topic": "Planner Cost Constants and Non-Sequential Disk Access",
     "sql_command": null,
-    "config_param": "random_page_cost"
+    "config_param": "random_page_cost",
+    "source_url": "https://www.postgresql.org/docs/15/runtime-config-query.html",
+    "doc_type": "record"
   },
   {
     "id": "008",
@@ -69,7 +83,9 @@
     "version": "14",
     "topic": "Planner Cost Constants for Sequential Disk Page Fetch",
     "sql_command": null,
-    "config_param": "seq_page_cost"
+    "config_param": "seq_page_cost",
+    "source_url": "https://www.postgresql.org/docs/14/runtime-config-query.html",
+    "doc_type": "record"
   },
   {
     "id": "009",
@@ -78,7 +94,9 @@
     "version": "15",
     "topic": "Effective Cache Size for Index Scan Decisions",
     "sql_command": null,
-    "config_param": "effective_cache_size"
+    "config_param": "effective_cache_size",
+    "source_url": "https://www.postgresql.org/docs/15/runtime-config-query.html",
+    "doc_type": "record"
   },
   {
     "id": "010",
@@ -87,7 +105,9 @@
     "version": "14",
     "topic": "JIT Compilation Thresholds and Overhead in Short Queries",
     "sql_command": null,
-    "config_param": "jit_above_cost"
+    "config_param": "jit_above_cost",
+    "source_url": "https://www.postgresql.org/docs/14/jit-decision.html",
+    "doc_type": "record"
   },
   {
     "id": "011",
@@ -96,7 +116,9 @@
     "version": "16",
     "topic": "Parallel Gather and Worker Allocation",
     "sql_command": null,
-    "config_param": "max_parallel_workers_per_gather"
+    "config_param": "max_parallel_workers_per_gather",
+    "source_url": "https://www.postgresql.org/docs/16/parallel-plans.html",
+    "doc_type": "record"
   },
   {
     "id": "012",
@@ -105,7 +127,9 @@
     "version": "17",
     "topic": "Declarative Partitioning and Partition Pruning",
     "sql_command": "CREATE TABLE PARTITION OF",
-    "config_param": "enable_partition_pruning"
+    "config_param": "enable_partition_pruning",
+    "source_url": "https://www.postgresql.org/docs/17/ddl-partitioning.html",
+    "doc_type": "record"
   },
   {
     "id": "013",
@@ -114,7 +138,9 @@
     "version": "15",
     "topic": "Checkpoints and WAL Retention Sizing",
     "sql_command": "CHECKPOINT",
-    "config_param": "max_wal_size"
+    "config_param": "max_wal_size",
+    "source_url": "https://www.postgresql.org/docs/15/wal-configuration.html",
+    "doc_type": "record"
   },
   {
     "id": "014",
@@ -123,7 +149,9 @@
     "version": "15",
     "topic": "Spreading Checkpoint I/O Over Time",
     "sql_command": null,
-    "config_param": "checkpoint_completion_target"
+    "config_param": "checkpoint_completion_target",
+    "source_url": "https://www.postgresql.org/docs/15/wal-configuration.html",
+    "doc_type": "record"
   },
   {
     "id": "015",
@@ -132,7 +160,9 @@
     "version": "13",
     "topic": "Autovacuum Cost Limiting and I/O Throttling",
     "sql_command": null,
-    "config_param": "autovacuum_vacuum_cost_limit"
+    "config_param": "autovacuum_vacuum_cost_limit",
+    "source_url": "https://www.postgresql.org/docs/13/runtime-config-autovacuum.html",
+    "doc_type": "record"
   },
   {
     "id": "016",
@@ -141,7 +171,9 @@
     "version": "14",
     "topic": "GIN Indexes for Multi-Value and Document Search",
     "sql_command": "CREATE INDEX USING gin",
-    "config_param": null
+    "config_param": null,
+    "source_url": "https://www.postgresql.org/docs/14/textsearch-indexes.html",
+    "doc_type": "record"
   },
   {
     "id": "017",
@@ -150,7 +182,9 @@
     "version": "16",
     "topic": "Query Performance Tracking and Cumulative Statistics",
     "sql_command": "CREATE EXTENSION pg_stat_statements",
-    "config_param": "pg_stat_statements.track"
+    "config_param": "pg_stat_statements.track",
+    "source_url": "https://www.postgresql.org/docs/16/pgstatstatements.html",
+    "doc_type": "record"
   },
   {
     "id": "018",
@@ -159,7 +193,9 @@
     "version": "15",
     "topic": "Live Tuple and Dead Tuple Statistics per Table",
     "sql_command": "SELECT * FROM pg_stat_user_tables",
-    "config_param": null
+    "config_param": null,
+    "source_url": "https://www.postgresql.org/docs/15/monitoring-stats.html",
+    "doc_type": "record"
   },
   {
     "id": "019",
@@ -168,7 +204,9 @@
     "version": "17",
     "topic": "Maintenance Work Memory for Index Builds and Vacuum",
     "sql_command": null,
-    "config_param": "maintenance_work_mem"
+    "config_param": "maintenance_work_mem",
+    "source_url": "https://www.postgresql.org/docs/17/runtime-config-resource.html",
+    "doc_type": "record"
   },
   {
     "id": "020",
@@ -177,6 +215,8 @@
     "version": "16",
     "topic": "Statistics Target for Histogram and Most Common Values",
     "sql_command": "ANALYZE",
-    "config_param": "default_statistics_target"
+    "config_param": "default_statistics_target",
+    "source_url": "https://www.postgresql.org/docs/16/planner-stats.html",
+    "doc_type": "record"
   }
 ]

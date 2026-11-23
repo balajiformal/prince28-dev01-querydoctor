@@ -1,0 +1,82 @@
+"""Load data/sample_records.json into Postgres.
+
+Safe to run again and again: new records are inserted, changed ones updated,
+unchanged ones skipped (we compare a sha256 fingerprint of each record).
+
+Run:  uv run python scripts/load_db.py
+"""
+
+import asyncio
+import hashlib
+import json
+from datetime import date
+
+from sqlalchemy import select, update
+
+from querydoctor.config import get_settings
+from querydoctor.db.models import Document
+from querydoctor.db.session import make_engine, make_sessionmaker
+
+TITLE_FIELD = "page"  # the record field that best names a record
+KNOWN = {"id", "title", "source_url", "licence", "doc_type", "published_on"}
+
+
+def fingerprint(record: dict) -> str:
+    canonical = json.dumps(record, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def to_row(record: dict) -> dict:
+    published = record.get("published_on")
+    extra = {k: v for k, v in record.items() if k not in KNOWN and k != "id"}
+    return {
+        "external_id": str(record["id"]),
+        "title": str(record.get("title") or record.get(TITLE_FIELD) or record["id"]),
+        "source_url": record.get("source_url"),
+        "licence": record.get("licence"),
+        "doc_type": record.get("doc_type") or "record",
+        "published_on": date.fromisoformat(published) if published else None,
+        "metadata_": extra,
+        "sha256": fingerprint(record),
+    }
+
+
+async def main() -> None:
+    settings = get_settings()
+    path = settings.data_file
+    records = json.loads(path.read_text(encoding="utf-8"))
+
+    engine = make_engine(settings)
+    session_factory = make_sessionmaker(engine)
+
+    inserted = updated = unchanged = 0
+
+    async with session_factory() as session, session.begin():
+        existing = {
+            row.external_id: row for row in (await session.execute(select(Document))).scalars()
+        }
+
+        for record in records:
+            row = to_row(record)
+            fp = row["sha256"]
+            ext_id = row["external_id"]
+
+            if ext_id not in existing:
+                session.add(Document(**row))
+                inserted += 1
+            elif existing[ext_id].sha256 != fp:
+                await session.execute(
+                    update(Document)
+                    .where(Document.external_id == ext_id)
+                    .values(**{k: v for k, v in row.items() if k != "external_id"})
+                )
+                updated += 1
+            else:
+                unchanged += 1
+
+    await engine.dispose()
+    print(f"records={len(records)} inserted={inserted} updated={updated} unchanged={unchanged}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
