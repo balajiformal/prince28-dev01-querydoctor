@@ -1,0 +1,182 @@
+[
+  {
+    "id": "001",
+    "page": "using-explain.html",
+    "chapter": "Performance Tips",
+    "version": "16",
+    "topic": "EXPLAIN Basics and Cost Estimation",
+    "sql_command": "EXPLAIN ANALYZE",
+    "config_param": null
+  },
+  {
+    "id": "002",
+    "page": "runtime-config-resource.html",
+    "chapter": "Server Configuration",
+    "version": "16",
+    "topic": "Memory Consumption and Sort Operations",
+    "sql_command": null,
+    "config_param": "work_mem"
+  },
+  {
+    "id": "003",
+    "page": "runtime-config-resource.html",
+    "chapter": "Server Configuration",
+    "version": "15",
+    "topic": "Shared Buffer Pool Sizing",
+    "sql_command": null,
+    "config_param": "shared_buffers"
+  },
+  {
+    "id": "004",
+    "page": "routine-vacuuming.html",
+    "chapter": "Routine Database Maintenance Tasks",
+    "version": "14",
+    "topic": "Preventing Table Bloat and Transaction ID Wraparound",
+    "sql_command": "VACUUM (VERBOSE, ANALYZE)",
+    "config_param": "autovacuum_vacuum_scale_factor"
+  },
+  {
+    "id": "005",
+    "page": "indexes-types.html",
+    "chapter": "Indexes",
+    "version": "15",
+    "topic": "B-Tree Index for Equality and Range Queries",
+    "sql_command": "CREATE INDEX",
+    "config_param": null
+  },
+  {
+    "id": "006",
+    "page": "indexes-types.html",
+    "chapter": "Indexes",
+    "version": "16",
+    "topic": "BRIN Indexes for Naturally Ordered Large Datasets",
+    "sql_command": "CREATE INDEX USING brin",
+    "config_param": null
+  },
+  {
+    "id": "007",
+    "page": "runtime-config-query.html",
+    "chapter": "Server Configuration",
+    "version": "15",
+    "topic": "Planner Cost Constants and Non-Sequential Disk Access",
+    "sql_command": null,
+    "config_param": "random_page_cost"
+  },
+  {
+    "id": "008",
+    "page": "runtime-config-query.html",
+    "chapter": "Server Configuration",
+    "version": "14",
+    "topic": "Planner Cost Constants for Sequential Disk Page Fetch",
+    "sql_command": null,
+    "config_param": "seq_page_cost"
+  },
+  {
+    "id": "009",
+    "page": "runtime-config-query.html",
+    "chapter": "Server Configuration",
+    "version": "15",
+    "topic": "Effective Cache Size for Index Scan Decisions",
+    "sql_command": null,
+    "config_param": "effective_cache_size"
+  },
+  {
+    "id": "010",
+    "page": "jit-decision.html",
+    "chapter": "Just-in-Time Compilation (JIT)",
+    "version": "14",
+    "topic": "JIT Compilation Thresholds and Overhead in Short Queries",
+    "sql_command": null,
+    "config_param": "jit_above_cost"
+  },
+  {
+    "id": "011",
+    "page": "parallel-plans.html",
+    "chapter": "Parallel Query",
+    "version": "16",
+    "topic": "Parallel Gather and Worker Allocation",
+    "sql_command": null,
+    "config_param": "max_parallel_workers_per_gather"
+  },
+  {
+    "id": "012",
+    "page": "ddl-partitioning.html",
+    "chapter": "Data Definition",
+    "version": "17",
+    "topic": "Declarative Partitioning and Partition Pruning",
+    "sql_command": "CREATE TABLE PARTITION OF",
+    "config_param": "enable_partition_pruning"
+  },
+  {
+    "id": "013",
+    "page": "wal-configuration.html",
+    "chapter": "Reliability and the Write-Ahead Log",
+    "version": "15",
+    "topic": "Checkpoints and WAL Retention Sizing",
+    "sql_command": "CHECKPOINT",
+    "config_param": "max_wal_size"
+  },
+  {
+    "id": "014",
+    "page": "wal-configuration.html",
+    "chapter": "Reliability and the Write-Ahead Log",
+    "version": "15",
+    "topic": "Spreading Checkpoint I/O Over Time",
+    "sql_command": null,
+    "config_param": "checkpoint_completion_target"
+  },
+  {
+    "id": "015",
+    "page": "runtime-config-autovacuum.html",
+    "chapter": "Server Configuration",
+    "version": "13",
+    "topic": "Autovacuum Cost Limiting and I/O Throttling",
+    "sql_command": null,
+    "config_param": "autovacuum_vacuum_cost_limit"
+  },
+  {
+    "id": "016",
+    "page": "textsearch-indexes.html",
+    "chapter": "Full Text Search",
+    "version": "14",
+    "topic": "GIN Indexes for Multi-Value and Document Search",
+    "sql_command": "CREATE INDEX USING gin",
+    "config_param": null
+  },
+  {
+    "id": "017",
+    "page": "view-pg-stat-statements.html",
+    "chapter": "Additional Supplied Modules",
+    "version": "16",
+    "topic": "Query Performance Tracking and Cumulative Statistics",
+    "sql_command": "CREATE EXTENSION pg_stat_statements",
+    "config_param": "pg_stat_statements.track"
+  },
+  {
+    "id": "018",
+    "page": "monitoring-stats.html",
+    "chapter": "Monitoring Database Activity",
+    "version": "15",
+    "topic": "Live Tuple and Dead Tuple Statistics per Table",
+    "sql_command": "SELECT * FROM pg_stat_user_tables",
+    "config_param": null
+  },
+  {
+    "id": "019",
+    "page": "runtime-config-resource.html",
+    "chapter": "Server Configuration",
+    "version": "17",
+    "topic": "Maintenance Work Memory for Index Builds and Vacuum",
+    "sql_command": null,
+    "config_param": "maintenance_work_mem"
+  },
+  {
+    "id": "020",
+    "page": "planner-stats.html",
+    "chapter": "Performance Tips",
+    "version": "16",
+    "topic": "Statistics Target for Histogram and Most Common Values",
+    "sql_command": "ANALYZE",
+    "config_param": "default_statistics_target"
+  }
+]
