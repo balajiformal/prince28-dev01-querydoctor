@@ -1,8 +1,14 @@
 # QueryDoctor
 
+[![CI](https://github.com/balajiformal/prince28-dev01-querydoctor/actions/workflows/ci.yml/badge.svg)](https://github.com/balajiformal/prince28-dev01-querydoctor/actions/workflows/ci.yml)
+[![Live](https://img.shields.io/website?url=https%3A%2F%2Fquerydoctor.onrender.com%2Fhealth&label=live)](https://querydoctor.onrender.com/docs)
+[![Uptime (30 days)](https://img.shields.io/uptimerobot/ratio/YOUR-MONITOR-KEY)](https://querydoctor.onrender.com/health)
+
+**Live:** https://querydoctor.onrender.com · [API docs](https://querydoctor.onrender.com/docs) · [health](https://querydoctor.onrender.com/health)
+
 A PostgreSQL expert that explains slow queries, EXPLAIN plans, indexes and configuration from the official docs for the user's Postgres version.
 
-**Status:** Day 1 foundation (FastAPI skeleton, quality gates). Live URL from Day 5.
+**Status:** Week 1 complete · live at https://querydoctor.onrender.com.
 
 ## Who it's for
 
