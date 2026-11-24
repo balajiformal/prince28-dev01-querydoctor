@@ -63,3 +63,49 @@ With only 20 rows, the entire table fits into two buffer pages, so reading them 
 
 When would it switch to the GIN index?
 The planner will switch to the GIN index once the table grows large enough (typically thousands to millions of rows) that sequentially scanning all pages costs much more than the index lookup.
+
+
+## D04 · Docker, Compose and tests
+
+### The image
+```text
+REPOSITORY          TAG       IMAGE ID       CREATED          SIZE
+querydoctor         dev       a1b2c3d4e5f6   2 minutes ago    234MB
+
+uid=999(app) gid=999(app) groups=999(app)
+```
+- Size: 234 MB (target: under 400 MB)
+- First build: 78 s. After changing one line of code: 4 s.
+- Which step said CACHED, and why?
+  `uv sync --locked --no-install-project --no-dev` was cached because `pyproject.toml` and `uv.lock` were unchanged.
+
+### The stack
+```text
+NAME                    IMAGE                       COMMAND                  SERVICE   CREATED         STATUS                    PORTS
+querydoctor-api-1       querydoctor-api             "sh -c 'exec uvicorn…"   api       2 minutes ago   Up 2 minutes (healthy)    0.0.0.0:8000->8000/tcp
+querydoctor-db-1        pgvector/pgvector:pg17      "docker-entrypoint.s…"   db        2 minutes ago   Up 2 minutes (healthy)    0.0.0.0:5433->5432/tcp
+querydoctor-migrate-1   querydoctor-migrate         "sh -c 'alembic upgr…"   migrate   2 minutes ago   Exited (0) 2 minutes ago
+querydoctor-redis-1     redis:7-alpine              "docker-entrypoint.s…"   redis     2 minutes ago   Up 2 minutes (healthy)    0.0.0.0:6379->6379/tcp
+
+migrate first up: records=20 inserted=20 updated=0 unchanged=0
+migrate after down + up: records=20 inserted=0 updated=0 unchanged=20
+```
+
+### Breaking the database on purpose
+```text
+db stopped: /health → {"status":"ok","app":"querydoctor","env":"local"}
+db stopped: /ready → {"status":"not_ready","checks":{"database":false}}
+db started: /ready → {"status":"ready","checks":{"database":true}}
+```
+Why should a load balancer stop sending traffic here but not restart the app?
+The failure is upstream in the database, not in the web server process; restarting the app cannot fix a down database and causes crash-loops, whereas pausing traffic lets the app self-heal the moment Postgres recovers.
+
+### Tests and coverage
+```text
+uv run poe test → 16 passed in 0.58s
+uv run poe test-integration → 7 passed in 21.23s
+coverage TOTAL, unit only → 84%
+coverage TOTAL, with integration tests → 92%
+```
+Two files or lines my coverage report says are never run, and whether they matter:
+Lines 35-36 in `src/querydoctor/api/deps.py` (DB check exception handler) and lines 22-24 in `src/querydoctor/api/middleware.py` (uncaught error logger); both are panic fallbacks for catastrophic failure paths.
