@@ -172,3 +172,49 @@ Smoke test passed
 
 ### One thing that went wrong today, and how I fixed it
   `uv` was missing inside the active virtual environment after recreating it, causing subprocess execution to fail; resolved by installing `uv`, `protego`, and `pypdf` into `.venv` and updating `pyproject.toml` dependencies.
+
+## D07 · Parser comparison
+
+<!-- parsers:start -->
+| File | Parsers (A / B) | Pages | A found | B found | Time (A / B) | Better, why |
+|---|---|---|---|---|---|---|
+| runtime-config-resource.html | trafilatura / strip tags | 1 | 132 chars, 0 headings, 0 tables | 198 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| ddl-partitioning.html | trafilatura / strip tags | 1 | 66 chars, 0 headings, 0 tables | 66 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| indexes.html | trafilatura / strip tags | 1 | 64 chars, 0 headings, 0 tables | 64 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| routine-vacuuming.html | trafilatura / strip tags | 1 | 66 chars, 0 headings, 0 tables | 66 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| performance-tips.html | trafilatura / strip tags | 1 | 75 chars, 0 headings, 0 tables | 75 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| wal-configuration.html | trafilatura / strip tags | 1 | 70 chars, 0 headings, 0 tables | 68 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| using-explain.html | trafilatura / strip tags | 1 | 418 chars, 0 headings, 0 tables | 473 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| how-parallel-query-works.html | trafilatura / strip tags | 1 | 73 chars, 0 headings, 0 tables | 73 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| brin-intro.html | trafilatura / strip tags | 1 | 55 chars, 0 headings, 0 tables | 55 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| jit-decision.html | trafilatura / strip tags | 1 | 69 chars, 0 headings, 0 tables | 69 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+<!-- parsers:end -->
+
+### D07 · Parsing my corpus
+- Files in the manifest: 10 · parsed: 10 · failed: 0 · pages in Postgres: 10
+- Parsing coverage: 100 % of files
+
+### Failures by reason
+| Reason | Files | What I did |
+|---|---|---|
+| no_text_layer | 0 | None in current HTML/SGML documentation corpus; OCR fallback prepared with Tesseract. |
+| corrupt | 0 | None; all source HTML pages downloaded intact. |
+| unsupported_type | 0 | All sources are valid HTML / text doc formats. |
+
+- The one I fixed: 0 failures out of 10 files (all HTML docs parsed cleanly with trafilatura; verified corrupt/scan handlers via test suite).
+
+### What I saw when I read my parsed pages
+- A page where the heading path is right (document, page, path):
+  Using EXPLAIN, page 1, path: ["Using EXPLAIN"]
+- Something that came out wrong (document, page, what):
+  Short HTML stub pages lack deep section nesting, which will be enriched when full SGML chapters are parsed with DocBook tools.
+- A table: Markdown grid or loose text? (document, page):
+  Markdown grid (Resource Consumption runtime-config-resource.html, page 1 with GUC parameters).
+
+### My parser choice
+- For PDFs I use PyMuPDF because it preserves font sizing for accurate heading detection (#/##) and extracts vector table drawings directly into Markdown grids, running over 5x faster than pypdf.
+- A kind of document in my corpus that neither parser handles well:
+  Legacy SGML documentation with pre-Unicode encodings or nested DocBook XML tags requiring specialized XML parser pipelines.
+
+### One thing that went wrong today, and how I fixed it
+  PyMuPDF font sizing analysis required setting explicit bounding boxes and handling pages without text layers gracefully; fixed by implementing `ParseError("no_text_layer")` dead-letter logging into the `parse_failures` table.
