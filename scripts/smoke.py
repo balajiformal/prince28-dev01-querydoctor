@@ -11,9 +11,13 @@ import time
 
 import httpx
 
+DEFAULT_LIVE_URL = "https://prince28-dev01-querydoctor-main.onrender.com"
+
 
 def smoke_test(base_url: str, expect_version: str | None = None, timeout: float = 300.0) -> None:
-    base_url = base_url.rstrip("/")
+    base_url = (base_url or "").strip().rstrip("/")
+    if not base_url or not base_url.startswith(("http://", "https://")):
+        base_url = DEFAULT_LIVE_URL
     start_time = time.time()
     client = httpx.Client(timeout=10.0)
 
@@ -62,7 +66,10 @@ def smoke_test(base_url: str, expect_version: str | None = None, timeout: float 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Smoke test the live QueryDoctor URL")
     parser.add_argument(
-        "url", help="Base URL of the deployed app (e.g. https://querydoctor.onrender.com)"
+        "url",
+        nargs="?",
+        default=DEFAULT_LIVE_URL,
+        help="Base URL of the deployed app (defaults to https://prince28-dev01-querydoctor-main.onrender.com)",
     )
     parser.add_argument("--expect-version", help="Expected git commit SHA in /health")
     args = parser.parse_args()
