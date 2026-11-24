@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/balajiformal/prince28-dev01-querydoctor/actions/workflows/ci.yml/badge.svg)](https://github.com/balajiformal/prince28-dev01-querydoctor/actions/workflows/ci.yml)
 [![Live](https://img.shields.io/website?url=https%3A%2F%2Fquerydoctor.onrender.com%2Fhealth&label=live)](https://querydoctor.onrender.com/docs)
-[![Uptime (30 days)](https://img.shields.io/uptimerobot/ratio/YOUR-MONITOR-KEY)](https://querydoctor.onrender.com/health)
+[![Uptime (30 days)](https://img.shields.io/uptimerobot/ratio/m804787984-833e458322afac5abf564d56)](https://querydoctor.onrender.com/health)
 
 **Live:** https://querydoctor.onrender.com · [API docs](https://querydoctor.onrender.com/docs) · [health](https://querydoctor.onrender.com/health)
 
