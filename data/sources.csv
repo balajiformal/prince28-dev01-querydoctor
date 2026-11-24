@@ -1,0 +1,17 @@
+# Sources for QueryDoctor. One row per file to download. Lines starting with # are notes.
+# Start target: Docs for the current version (about 1,000 pages)
+# Where to look:
+# https://www.postgresql.org/docs/
+# https://github.com/postgres/postgres (doc/src/sgml)
+# Terms on my project card: PostgreSQL License (permissive).
+url,source,licence,title
+https://www.postgresql.org/docs/current/using-explain.html,postgres-docs,"PostgreSQL License (permissive).",Using EXPLAIN
+https://www.postgresql.org/docs/current/runtime-config-resource.html,postgres-docs,"PostgreSQL License (permissive).",Resource Consumption
+https://www.postgresql.org/docs/current/routine-vacuuming.html,postgres-docs,"PostgreSQL License (permissive).",Routine Vacuuming
+https://www.postgresql.org/docs/current/brin-intro.html,postgres-docs,"PostgreSQL License (permissive).",BRIN Indexes
+https://www.postgresql.org/docs/current/jit-decision.html,postgres-docs,"PostgreSQL License (permissive).",Just-in-Time Compilation
+https://www.postgresql.org/docs/current/how-parallel-query-works.html,postgres-docs,"PostgreSQL License (permissive).",How Parallel Query Works
+https://www.postgresql.org/docs/current/ddl-partitioning.html,postgres-docs,"PostgreSQL License (permissive).",Table Partitioning
+https://www.postgresql.org/docs/current/wal-configuration.html,postgres-docs,"PostgreSQL License (permissive).",WAL Configuration
+https://www.postgresql.org/docs/current/indexes.html,postgres-docs,"PostgreSQL License (permissive).",Indexes Overview
+https://www.postgresql.org/docs/current/performance-tips.html,postgres-docs,"PostgreSQL License (permissive).",Performance Tips
