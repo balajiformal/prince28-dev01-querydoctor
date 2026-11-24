@@ -1,14 +1,14 @@
 # QueryDoctor
 
 [![CI](https://github.com/balajiformal/prince28-dev01-querydoctor/actions/workflows/ci.yml/badge.svg)](https://github.com/balajiformal/prince28-dev01-querydoctor/actions/workflows/ci.yml)
-[![Live](https://img.shields.io/website?url=https%3A%2F%2Fquerydoctor.onrender.com%2Fhealth&label=live)](https://querydoctor.onrender.com/docs)
-[![Uptime (30 days)](https://img.shields.io/uptimerobot/ratio/m804787984-833e458322afac5abf564d56)](https://querydoctor.onrender.com/health)
+[![Live](https://img.shields.io/website?url=https%3A%2F%2Fprince28-dev01-querydoctor-main.onrender.com%2Fhealth&label=live)](https://prince28-dev01-querydoctor-main.onrender.com/docs)
+[![Uptime (30 days)](https://img.shields.io/uptimerobot/ratio/m804787984-833e458322afac5abf564d56)](https://prince28-dev01-querydoctor-main.onrender.com/health)
 
-**Live:** https://querydoctor.onrender.com · [API docs](https://querydoctor.onrender.com/docs) · [health](https://querydoctor.onrender.com/health)
+**Live:** https://prince28-dev01-querydoctor-main.onrender.com · [API docs](https://prince28-dev01-querydoctor-main.onrender.com/docs) · [health](https://prince28-dev01-querydoctor-main.onrender.com/health)
 
 A PostgreSQL expert that explains slow queries, EXPLAIN plans, indexes and configuration from the official docs for the user's Postgres version.
 
-**Status:** Week 1 complete · live at https://querydoctor.onrender.com.
+**Status:** Week 1 complete · live at https://prince28-dev01-querydoctor-main.onrender.com.
 
 ## Who it's for
 

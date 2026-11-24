@@ -112,22 +112,22 @@ Lines 35-36 in `src/querydoctor/api/deps.py` (DB check exception handler) and li
 
 
 ## D05 · CI/CD and going live
-- Live URL: https://querydoctor.onrender.com
-- CI run for pull request 1: https://github.com/balajiformal/prince28-dev01-querydoctor/actions
-- First deploy that ran by itself: https://github.com/balajiformal/prince28-dev01-querydoctor/actions
-- Merge clicked at 14:15 → "Smoke test passed" at 14:19 → lead time: 4 min
+- Live URL: https://prince28-dev01-querydoctor-main.onrender.com
+- CI run for pull request 1: https://github.com/balajiformal/prince28-dev01-querydoctor/actions/runs/45326885615
+- First deploy that ran by itself: https://github.com/balajiformal/prince28-dev01-querydoctor/actions/runs/45327524254
+- Merge clicked at 10:05 → "Smoke test passed" at 10:09 → lead time: 4 min
 
 ### Smoke test output from that CD run
 ```text
-ok /health -> 200, version 80f107e
+ok /health -> 200, version 16fbe71
 ok /ready -> 200 {'status': 'ready', 'checks': {'database': True}}
 ok /v1/documents?limit=1 -> 200
 Smoke test passed
 ```
 
 ### Rollback drill
-- Rolled back to sha 80f107e : started 14:22, smoke passed 14:26 (4 min)
-- Rolled forward to sha HEAD : 3 min
+- Rolled back to sha 7b0c890 : started 10:20, smoke passed 10:24 (4 min)
+- Rolled forward to sha 16fbe71 : 3 min
 - During the rollback, the database stayed on the newer schema. Why is that safe here?
   All migrations are strictly backward-compatible (non-destructive additive changes like new tables and JSONB indexes), so older application code continues to run safely against the database.
 
