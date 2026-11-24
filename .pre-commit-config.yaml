@@ -9,6 +9,7 @@ repos:
       - id: check-toml
       - id: check-added-large-files
         args: ["--maxkb=500"]
+        exclude: ^data/manifest\.jsonl$ # the manifest can grow large
       - id: detect-private-key
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -22,5 +23,5 @@ repos:
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        # uv.lock hashes and Alembic revision ids look random but are not secrets
-        exclude: ^(uv\.lock|migrations/versions/.*|tests/.*)$
+        # uv.lock hashes, Alembic revision ids, and manifest sha256 look random but are not secrets
+        exclude: ^(uv\.lock|migrations/versions/.*|tests/.*|data/manifest\.jsonl)$

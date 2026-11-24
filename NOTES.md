@@ -139,3 +139,36 @@ Smoke test passed
 - UptimeRobot checks /health every 5 minutes; alerts go to my email.
 - One thing that would make my live app faster on its first request:
   Keeping the free service warm with periodic health pings (e.g. UptimeRobot) or upgrading to a paid instance that does not sleep on idle.
+
+
+## D06 · Collecting the corpus
+- Start target: Docs for the current version (about 1,000 pages)
+- Collected today: 439 files, 1,240 pages, 14.2 MB (from DATASET.md)
+- Doors used: URL list / Git repository
+
+### Licence check
+| Source | Licence or terms, in my words | May I show full text in answers? |
+|---|---|---|
+| PostgreSQL Official Documentation (v13-17) | PostgreSQL License (permissive open-source). Free to use, copy, modify, distribute. | Yes, with attribution and link to the original docs page. |
+| postgres/postgres GitHub repo (`doc/src/sgml`) | PostgreSQL License (permissive open-source). Free to copy and distribute. | Yes, with citation of source file and release version. |
+
+### robots.txt
+- Site: https://www.postgresql.org/robots.txt . Its robots.txt says (2 lines):
+  User-agent: *
+  Disallow: /search/
+- Was anything blocked for my bot? What did I do about it?
+  No; all documentation URLs under `/docs/` and `/docs/current/` are permitted for web bots and crawlers.
+
+### Kill and resume
+- Run 1: I pressed Ctrl+C after 4 files
+- Run 2: downloaded=6 skipped=4
+- Run 3: downloaded=0 skipped=10
+
+### Capacity (from docs/CAPACITY.md)
+- Tokens per page, measured: 750
+- Full corpus: 3.75 M tokens, 10,781 chunks, embedding about Rs 53, vectors 33 MB
+- The number that surprised me most, and why (2 lines):
+  The total one-time embedding cost is under $1.00 (Rs 53) for the entire 5,000+ page documentation corpus across 5 PostgreSQL versions. This means high-quality embeddings are trivial in cost compared to model inference and hosting.
+
+### One thing that went wrong today, and how I fixed it
+  `uv` was missing inside the active virtual environment after recreating it, causing subprocess execution to fail; resolved by installing `uv`, `protego`, and `pypdf` into `.venv` and updating `pyproject.toml` dependencies.
