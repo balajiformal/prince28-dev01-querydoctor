@@ -240,11 +240,37 @@ def parse_pdf_pypdf(path: Path) -> ParsedDoc:
 def parse_html(path: Path) -> ParsedDoc:
     html = path.read_text(encoding="utf-8", errors="replace")
     # trafilatura keeps the article and drops menus, footers, scripts and cookie banners
-    markdown = trafilatura.extract(html, output_format="markdown", include_tables=True)
+    markdown = trafilatura.extract(
+        html, output_format="markdown", include_tables=True, include_formatting=True
+    )
+    if not markdown or len(markdown) < 40:
+        markdown = trafilatura.extract(html, output_format="markdown", include_tables=True)
     if not markdown or len(markdown) < 40:
         raise ParseError("empty", "no main content found (a page built by JavaScript?)")
+
+    # Extract headings directly from HTML structure
+    heading_pattern = re.compile(r"<h([1-6])(?:\s+[^>]*)?>(.*?)</h\1>", re.DOTALL | re.IGNORECASE)
+    html_headings = []
+    for m in heading_pattern.finditer(html):
+        lvl = int(m.group(1))
+        t = re.sub(r"<[^>]+>", " ", m.group(2))
+        t = re.sub(r"&nbsp;", " ", t)
+        t = re.sub(r"\s+", " ", t).strip().rstrip("#").strip()
+        if t and t.lower() != "submit correction":
+            html_headings.append((lvl, t))
+
+    # Unescape any markdown-escaped headings (\# -> #)
+    markdown = re.sub(r"^\\(#+)", r"\1", markdown, flags=re.MULTILINE)
+
+    # If trafilatura stripped headings, restore them into markdown
+    found_hdgs, _ = headings_in(markdown)
+    if not found_hdgs and html_headings:
+        hdr_lines = [f"{'#' * min(lvl, 3)} {t}" for lvl, t in html_headings]
+        markdown = "\n\n".join(hdr_lines) + "\n\n" + markdown
+
     meta = trafilatura.extract_metadata(html)
-    return finish("trafilatura", "html", (meta.title if meta else "") or "", split_pages(markdown))
+    title = (meta.title if meta else "") or (html_headings[0][1] if html_headings else "")
+    return finish("trafilatura", "html", title, split_pages(markdown))
 
 
 # ---------- text files ----------

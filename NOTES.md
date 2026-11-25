@@ -178,16 +178,16 @@ Smoke test passed
 <!-- parsers:start -->
 | File | Parsers (A / B) | Pages | A found | B found | Time (A / B) | Better, why |
 |---|---|---|---|---|---|---|
-| runtime-config-resource.html | trafilatura / strip tags | 1 | 132 chars, 0 headings, 0 tables | 198 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
-| ddl-partitioning.html | trafilatura / strip tags | 1 | 66 chars, 0 headings, 0 tables | 66 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
-| indexes.html | trafilatura / strip tags | 1 | 64 chars, 0 headings, 0 tables | 64 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
-| routine-vacuuming.html | trafilatura / strip tags | 1 | 66 chars, 0 headings, 0 tables | 66 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
-| performance-tips.html | trafilatura / strip tags | 1 | 75 chars, 0 headings, 0 tables | 75 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
-| wal-configuration.html | trafilatura / strip tags | 1 | 70 chars, 0 headings, 0 tables | 68 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
-| using-explain.html | trafilatura / strip tags | 1 | 418 chars, 0 headings, 0 tables | 473 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
-| how-parallel-query-works.html | trafilatura / strip tags | 1 | 73 chars, 0 headings, 0 tables | 73 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
-| brin-intro.html | trafilatura / strip tags | 1 | 55 chars, 0 headings, 0 tables | 55 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
-| jit-decision.html | trafilatura / strip tags | 1 | 69 chars, 0 headings, 0 tables | 69 chars, 0 headings, 0 tables | 0.00 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| runtime-config-resource.html | trafilatura / strip tags | 13 | 34,348 chars, 8 headings, 0 tables | 35,897 chars, 0 headings, 0 tables | 0.08 s / 0.01 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| routine-vacuuming.html | trafilatura / strip tags | 16 | 42,062 chars, 19 headings, 0 tables | 44,066 chars, 0 headings, 0 tables | 0.07 s / 0.01 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| using-explain.html | trafilatura / strip tags | 21 | 46,059 chars, 4 headings, 0 tables | 47,130 chars, 0 headings, 0 tables | 0.21 s / 0.01 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| ddl-partitioning.html | trafilatura / strip tags | 16 | 41,545 chars, 14 headings, 0 tables | 42,554 chars, 0 headings, 0 tables | 0.06 s / 0.01 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| wal-configuration.html | trafilatura / strip tags | 7 | 17,149 chars, 1 headings, 0 tables | 17,789 chars, 0 headings, 0 tables | 0.03 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| performance-tips.html | trafilatura / strip tags | 1 | 484 chars, 1 headings, 0 tables | 1,950 chars, 0 headings, 0 tables | 0.02 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| how-parallel-query-works.html | trafilatura / strip tags | 2 | 3,747 chars, 1 headings, 0 tables | 4,463 chars, 0 headings, 0 tables | 0.01 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| brin-intro.html | trafilatura / strip tags | 2 | 4,674 chars, 2 headings, 0 tables | 5,351 chars, 0 headings, 0 tables | 0.01 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| jit-decision.html | trafilatura / strip tags | 2 | 3,484 chars, 2 headings, 0 tables | 4,192 chars, 0 headings, 0 tables | 0.01 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
+| indexes.html | trafilatura / strip tags | 1 | 506 chars, 1 headings, 0 tables | 1,776 chars, 0 headings, 0 tables | 0.01 s / 0.00 s | trafilatura: extracts main content, drops HTML tags/scripts |
 <!-- parsers:end -->
 
 ### D07 · Parsing my corpus

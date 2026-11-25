@@ -26,9 +26,13 @@ async def failed_paths(session: AsyncSession) -> set[str]:
 
 async def save_document(session: AsyncSession, record: dict, parsed: ParsedDoc) -> None:
     """One manifest record + its parsed pages -> documents and pages. Clears an old failure."""
+    ext_id = document_id(record["sha256"])
+    existing = await session.scalar(select(Document).where(Document.external_id == ext_id))
+    if existing is not None:
+        return
     title = parsed.title or record.get("title") or Path(record["path"]).stem
     document = Document(
-        external_id=document_id(record["sha256"]),
+        external_id=ext_id,
         title=title[:500],
         source_url=record["url"],
         licence=(record.get("licence") or "")[:200],

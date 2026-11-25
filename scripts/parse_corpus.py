@@ -82,6 +82,9 @@ async def run(args: argparse.Namespace) -> int:
                 counts["failed"] += 1
                 reasons[error.reason] += 1
                 print(f"failed {error.reason:<16} {record['path']}", flush=True)
+            except Exception as exc:
+                await session.rollback()
+                print(f"skipped {record['path']}: {exc}", flush=True)
 
             if number % 50 == 0:
                 print(f"... {number} of {len(todo)} files", flush=True)
