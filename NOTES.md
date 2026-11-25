@@ -218,3 +218,36 @@ Smoke test passed
 
 ### One thing that went wrong today, and how I fixed it
   PyMuPDF font sizing analysis required setting explicit bounding boxes and handling pages without text layers gracefully; fixed by implementing `ParseError("no_text_layer")` dead-letter logging into the `parse_failures` table.
+
+
+## D08 · LLM gateway
+- Primary: gemini-3.8-flash (Gemini) · fallback: openai/gpt-oss-20b (Groq)
+- First question on my laptop: first words after 1.25 s, total 2.45 s, tokens in 135 / out 92, cost Rs 0.041250
+- Same question on my live URL (second, awake request): first words after 1.35 s. Day 1 target: under 1.5 s
+
+### Tokens: English against Tamil
+| Message | tokens in |
+|---|---|
+| "Hi" (baseline: mostly my system prompt) | 128 |
+| The English sentence | 138 |
+| The same sentence in Tamil | 165 |
+- The Tamil message needs about 3.7 times the tokens of the English one.
+
+### What the model does without my documents
+- Question 6 ("Why is our production database slow right now?"): did it admit it can't know? Its exact words:
+  "I am not sure why your specific production database is slow right now, as I do not have access to your live system metrics, active queries, or server logs."
+- A detail it got wrong or invented (question → what it said → what is true):
+  Asked about max_parallel_maintenance_workers in Postgres 11 → claimed default was 4 → default is actually 2 in official PostgreSQL documentation.
+- The off-topic question: did it decline in one sentence?
+  Yes: "I am a PostgreSQL expert and cannot answer questions outside of PostgreSQL databases."
+
+### Fallback and circuit breaker
+- With the primary broken: provider groq , fallback YES , first words after 0.52 s
+- The question at which "llm call gemini … error" stopped appearing in the log: number 4
+
+### The bill
+- /v1/usage today: calls 6 , errors 1 , fallbacks 1 , cost Rs 0.0845
+- Average per answered question: Rs 0.0169 (my Day 1 target: under Rs 0.50)
+
+### One thing that went wrong today, and how I fixed it
+  The primary Gemini model experienced high demand spikes returning 503; resolved seamlessly by our LLMGateway falling back to Groq (`openai/gpt-oss-20b`) with backoff and retry without breaking streaming to the user.

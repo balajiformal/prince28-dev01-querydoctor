@@ -9,7 +9,9 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from querydoctor.config import Settings
+from querydoctor.db.llm_calls import UsageRepository
 from querydoctor.db.repository import DocumentRepository
+from querydoctor.llm.gateway import LLMGateway
 
 
 def get_app_settings(request: Request) -> Settings:
@@ -31,11 +33,21 @@ async def check_db(request: Request) -> bool:
     try:
         async with request.app.state.engine.connect() as conn:
             await asyncio.wait_for(conn.execute(text("SELECT 1")), timeout=2)
-        return True
+            return True
     except Exception:
         return False
 
 
+def get_gateway(request: Request) -> LLMGateway:
+    return request.app.state.gateway
+
+
+async def get_usage_repo(session: Annotated[AsyncSession, Depends(get_session)]) -> UsageRepository:
+    return UsageRepository(session)
+
+
 SettingsDep = Annotated[Settings, Depends(get_app_settings)]
+GatewayDep = Annotated[LLMGateway, Depends(get_gateway)]
+UsageDep = Annotated[UsageRepository, Depends(get_usage_repo)]
 RepoDep = Annotated[DocumentRepository, Depends(get_repo)]
 DbCheckDep = Annotated[bool, Depends(check_db)]
