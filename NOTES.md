@@ -251,3 +251,46 @@ Smoke test passed
 
 ### One thing that went wrong today, and how I fixed it
   The primary Gemini model experienced high demand spikes returning 503; resolved seamlessly by our LLMGateway falling back to Groq (`openai/gpt-oss-20b`) with backoff and retry without breaking streaming to the user.
+
+
+## D09 · Prompt versions compared
+
+<!-- prompts:start -->
+
+| Prompt version | Correct | Accuracy | Invalid replies | Avg tokens in |
+|---|---|---|---|---|
+| classify_v1 | 17/20 | 85% | 0 | 54 |
+| classify_v2 | 19/20 | 95% | 0 | 115 |
+| classify_v3 | 20/20 | 100% | 0 | 312 |
+| classify_v4 | 20/20 | 100% | 0 | 365 |
+
+<!-- prompts:end -->
+
+### Router prompt: which version won
+- classify_v3 and classify_v4 reached 100% accuracy on the 20-question test set (10 docs, 5 personal, 5 off_topic).
+- classify_v1 only achieved 85% (17/20), misclassifying live production database queries ("Why is our production database slow right now?") as `docs` because it lacked boundary definitions between static engine documentation and runtime server telemetry. It also fell victim to prompt injection ("Ignore all previous instructions...").
+- classify_v2 improved to 95% (19/20) by establishing definitions for live system state and private connection strings, but classify_v3 sealed 100% (20/20) with few-shot examples clearly anchoring prompt injection attempts to `off_topic` and runtime questions to `personal`.
+- Token comparison: classify_v3 used 312 tokens in versus 54 for v1 and 115 for v2. The additional ~200 tokens cost less than Rs 0.002 per call, which is completely worth paying to ensure 100% routing fidelity and prevent leaking or hallucinating on personal/out-of-scope queries.
+
+### DocMeta contract: tailored for QueryDoctor
+- **Fields kept:** `doc_kind`, `year`, `language`, `summary`, `topics`.
+- **Fields deleted:** Generic placeholder fields like `page` (since our ingest parser already tracks page numbers per Page entity) and arbitrary open text attributes.
+- **Fields tightened & tailored:**
+  - `chapter`: list of documentation sections/chapters (max 8 entries, max 80 chars).
+  - `version`: list of applicable PostgreSQL versions (`13`, `14`, `15`, `16`, `17`, or `all`).
+  - `sql_command`: list of primary SQL statements covered (e.g. `EXPLAIN`, `VACUUM`, `CREATE INDEX`).
+  - `config_param`: list of PostgreSQL GUC configuration parameters mentioned (e.g. `work_mem`, `shared_buffers`, `jit_above_cost`).
+  - `topics`: enforced lowercase deduplication via field validator (min 1, max 6 topics) so "explain" and "EXPLAIN" merge automatically.
+  - `extra="forbid"`: prevents schema creep or unknown keys in model responses.
+
+### Metadata extraction run
+- Filtered extraction on documents in Postgres using `prompts/extract_v1.md` and `DocMeta`.
+- Parsed documents: 10 HTML core docs + 429 SGML chapters.
+- Extraction trial (5 documents):
+  - OK on first attempt: 4
+  - Repaired via validation-retry loop: 1 (initial output returned markdown backticks which were repaired on retry)
+  - Failed after 3 attempts: 0
+  - Average cost per document: Rs 0.018
+
+### One thing that went wrong today, and how I fixed it
+  The model initially returned Markdown fences (```json ... ```) and minor schema deviations for list constraints on short text fields; fixed by wrapping `DocMeta` schema validation in an automated validation-retry loop (`extract.py`) that feeds back the specific Pydantic ValidationError message directly into the model prompt, correcting invalid replies on the second attempt.
