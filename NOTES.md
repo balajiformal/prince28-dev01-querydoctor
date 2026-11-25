@@ -191,7 +191,7 @@ Smoke test passed
 <!-- parsers:end -->
 
 ### D07 · Parsing my corpus
-- Files in the manifest: 10 · parsed: 10 · failed: 0 · pages in Postgres: 10
+- Files in the manifest: 439 · parsed: 439 · failed: 0 · pages in Postgres: 4,863
 - Parsing coverage: 100 % of files
 
 ### Failures by reason
