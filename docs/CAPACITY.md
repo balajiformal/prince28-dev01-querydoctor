@@ -3,15 +3,15 @@
 Full corpus target: Docs for 5 versions + all release notes (5,000+ pages)
 
 <!-- generated:start -->
-## Measured on my start corpus (2026-11-24 06:10 UTC)
+## Measured on my start corpus (2026-11-25 05:50 UTC)
 
 | What | Value |
 |---|---|
-| Files | 10 |
-| Size on disk | 0.5 MB |
-| Pages (PDF pages + 1 per 3,000 characters of text/HTML) | 184 |
-| Characters of text | 552,000 |
-| Estimated tokens (characters / 4) | 138,000 |
+| Files | 439 |
+| Size on disk | 13.4 MB |
+| Pages (PDF pages + 1 per 3,000 characters of text/HTML) | 4,166 |
+| Characters of text | 12,497,600 |
+| Estimated tokens (characters / 4) | 3,124,400 |
 | Tokens per page | 750 |
 | PDFs with almost no text (scanned? OCR is Day 7) | 0 |
 | Files not measured (zip, xlsx, unreadable) | 0 |
@@ -20,11 +20,11 @@ Full corpus target: Docs for 5 versions + all release notes (5,000+ pages)
 
 | What | How | Value |
 |---|---|---|
-| Scale factor | target / measured | x 27.2 |
+| Scale factor | target / measured | x 1.2 |
 | Tokens | measured tokens x scale | 3.75 M |
-| Raw files | measured MB x scale | 14 MB |
+| Raw files | measured MB x scale | 16 MB |
 | Chunks | tokens / 400 x 1.15 overlap | 10,781 |
-| Embedding cost, one time | tokens x 1.15 x $0.15 per 1M | $0.56 = Rs 53 |
+| Embedding cost, one time | tokens x 1.15 x $0.15 per 1M | $0.65 = Rs 61 |
 | Vector storage | chunks x 768 numbers x 4 bytes | 33 MB |
 | Text in Postgres | characters x scale x 1.2 | 18 MB |
 

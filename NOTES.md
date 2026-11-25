@@ -143,7 +143,7 @@ Smoke test passed
 
 ## D06 · Collecting the corpus
 - Start target: Docs for the current version (about 1,000 pages)
-- Collected today: 439 files, 1,240 pages, 14.2 MB (from DATASET.md)
+- Collected today: 439 files, 4,166 pages, 13.4 MB (from DATASET.md)
 - Doors used: URL list / Git repository
 
 ### Licence check
