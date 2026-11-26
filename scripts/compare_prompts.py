@@ -106,6 +106,14 @@ async def run(args: argparse.Namespace) -> int:
                     f"got {miss['got']} (reply {miss['reply'][:40]!r}) {miss['question'][:60]!r}"
                 )
 
+            pairs: dict[tuple[str, str], int] = {}
+            for r in results:
+                pair = (r["label"], r["got"])
+                pairs[pair] = pairs.get(pair, 0) + 1
+            matrix = ", ".join(f"{t}->{g}:{n}" for (t, g), n in sorted(pairs.items()) if t != g)
+            if matrix:
+                print(f"{version} confusion: {matrix}")
+
             rows.append(
                 {
                     "version": version,

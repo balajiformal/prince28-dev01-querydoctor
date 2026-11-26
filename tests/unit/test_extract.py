@@ -101,13 +101,54 @@ async def test_extract_success():
         prompt="Extract metadata",
         version="v1",
         title="Using EXPLAIN",
-        text="Content of doc",
+        text="Content of doc from 2023",
     )
     assert res.record is not None
     assert isinstance(res.record, DocMeta)
     assert res.record.doc_kind == "tutorial"
     assert res.attempts == 1
     assert len(res.errors) == 0
+
+
+@pytest.mark.asyncio
+async def test_extract_rejects_hallucinated_year():
+    bad_year = {
+        "doc_kind": "tutorial",
+        "year": 2024,
+        "language": "en",
+        "summary": "Detailed guide on using EXPLAIN ANALYZE for query optimization in Postgres.",
+        "topics": ["performance", "explain"],
+        "chapter": ["Using EXPLAIN"],
+        "version": ["15"],
+        "sql_command": ["EXPLAIN"],
+        "config_param": [],
+    }
+    good = {**bad_year, "year": None}
+    llm = FakeLLM(script=[json.dumps(bad_year), json.dumps(good)])
+    gw = LLMGateway([llm])
+
+    res = await extract(
+        gateway=gw,
+        schema=DocMeta,
+        prompt="Extract metadata",
+        version="v1",
+        title="Using EXPLAIN",
+        text="Content of doc with no year mentioned.",
+    )
+    assert res.record is not None
+    assert res.record.year is None
+    assert res.attempts == 2
+    assert "year 2024 is not in the document" in res.errors[0]
+
+
+def test_the_extract_prompt_names_every_field_of_the_contract():
+    from pathlib import Path
+
+    from querydoctor.llm.prompts import latest, read_prompt
+
+    prompt = read_prompt(Path("prompts"), latest(Path("prompts"), "extract"))
+    missing = [name for name in DocMeta.model_fields if name not in prompt]
+    assert not missing, f"prompts/extract_v*.md does not mention: {missing}"
 
 
 @pytest.mark.asyncio

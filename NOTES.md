@@ -289,7 +289,8 @@ Smoke test passed
 - Parsed documents: 10 HTML core docs + 429 SGML chapters (resumable via `scripts/extract_metadata.py`; remaining documents continue on re-run without repeating completed ones).
 - Extraction trial (5 documents):
   - `prompt=extract_v1 pending=5 ok=5 repaired=0 failed=0 tokens_in=4383 tokens_out=3209 cost=Rs 0.1227 seconds=55` (~Rs 0.0245 per document).
-- Followed up with a 50-document batch (`scripts/extract_metadata.py --limit 50 --rpm 25`) and verified filtered results on the live URL (`/v1/documents?doc_kind=reference`).
+- 50-document batch (`scripts/extract_metadata.py --limit 50 --rpm 25`):
+  - `prompt=extract_v1 pending=50 ok=50 repaired=0 failed=0 tokens_in=89266 tokens_out=33272 cost=Rs 1.5843 seconds=945` (~Rs 0.0317 per document; 55 of 439 parsed documents extracted so far, remaining documents can be resumed anytime).
 
 ### One thing that went wrong today, and how I fixed it
   The model initially returned Markdown fences (```json ... ```) and minor schema deviations for list constraints on short text fields; fixed by wrapping `DocMeta` schema validation in an automated validation-retry loop (`extract.py`) that feeds back the specific Pydantic ValidationError message directly into the model prompt, correcting invalid replies on the second attempt.
