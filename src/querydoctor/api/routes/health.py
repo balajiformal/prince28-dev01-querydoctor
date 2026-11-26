@@ -24,3 +24,14 @@ async def ready(db_ok: DbCheckDep, response: Response) -> dict:
     if not ok:
         response.status_code = 503
     return {"status": "ready" if ok else "not_ready", "checks": checks}
+
+
+@router.get("/info")
+def info(settings: SettingsDep) -> dict[str, str]:
+    """Basic service metadata and API documentation pointer."""
+    return {
+        "app": settings.app_name,
+        "env": settings.app_env,
+        "version": settings.git_sha,
+        "docs_url": "/docs",
+    }

@@ -44,6 +44,12 @@ async def list_documents(
     }
 
 
+@router.get("/facets")
+async def document_facets(repo: RepoDep) -> dict:
+    """Distribution of extracted doc_kind and language values."""
+    return await repo.facets()
+
+
 @router.get("/{doc_id}")
 async def get_document(doc_id: str, repo: RepoDep) -> dict:
     record = await repo.get(doc_id)

@@ -10,8 +10,10 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from querydoctor.api.deps import GatewayDep, UsageDep
+from querydoctor.api.deps import GatewayDep, SettingsDep, UsageDep
+from querydoctor.llm.classify import classify as route_question
 from querydoctor.llm.gateway import LLMResult, LLMUnavailable
+from querydoctor.llm.prompts import latest, read_prompt
 
 router = APIRouter(tags=["chat"])
 PROMPT_VERSION = "chat_system_v1"  # the file prompts/chat_system_v1.md
@@ -68,6 +70,18 @@ async def chat(body: ChatRequest, request: Request, gateway: GatewayDep):
 
     headers = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
     return StreamingResponse(events(), media_type="text/event-stream", headers=headers)
+
+
+@router.post("/classify")
+async def classify_endpoint(body: ChatRequest, gateway: GatewayDep, settings: SettingsDep) -> dict:
+    """Route a question into docs, personal, or off_topic using the latest classify prompt."""
+    version = latest(settings.prompts_dir, "classify")
+    prompt = read_prompt(settings.prompts_dir, version)
+    try:
+        label, result = await route_question(gateway, prompt, version, body.message)
+    except LLMUnavailable as exc:
+        raise HTTPException(status_code=503, detail=f"No model could answer: {exc}") from exc
+    return {"label": label, "prompt_version": version, **summary(result)}
 
 
 @router.get("/usage")

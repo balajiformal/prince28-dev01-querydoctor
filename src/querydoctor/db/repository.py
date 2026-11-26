@@ -64,3 +64,16 @@ class DocumentRepository:
     async def get(self, external_id: str) -> dict[str, Any] | None:
         doc = await self.session.scalar(select(Document).where(Document.external_id == external_id))
         return to_dict(doc) if doc else None
+
+    async def facets(self) -> dict[str, dict[str, int]]:
+        """Counts of extracted doc_kind and language values across documents."""
+        out: dict[str, dict[str, int]] = {}
+        for field in ("doc_kind", "language"):
+            col = Document.metadata_[field].astext
+            rows = (
+                await self.session.execute(
+                    select(col, func.count()).where(col.is_not(None)).group_by(col)
+                )
+            ).all()
+            out[field] = {str(k): int(v) for k, v in rows}
+        return out
