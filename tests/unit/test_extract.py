@@ -49,16 +49,18 @@ def test_doc_meta_valid():
 
 def test_doc_meta_invalid_extra_field():
     with pytest.raises(ValidationError):
-        DocMeta(
-            doc_kind="reference",
-            language="en",
-            summary="This is a valid length summary of the document for testing purposes.",
-            topics=["postgres"],
-            chapter=[],
-            version=[],
-            sql_command=[],
-            config_param=[],
-            extra_field="disallowed",
+        DocMeta.model_validate(
+            {
+                "doc_kind": "reference",
+                "language": "en",
+                "summary": "This is a valid length summary of the document for testing purposes.",
+                "topics": ["postgres"],
+                "chapter": [],
+                "version": [],
+                "sql_command": [],
+                "config_param": [],
+                "extra_field": "disallowed",
+            }
         )
 
 
