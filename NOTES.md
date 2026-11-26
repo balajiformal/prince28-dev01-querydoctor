@@ -259,18 +259,19 @@ Smoke test passed
 
 | Prompt version | Correct | Accuracy | Invalid replies | Avg tokens in |
 |---|---|---|---|---|
-| classify_v1 | 17/20 | 85% | 0 | 54 |
-| classify_v2 | 19/20 | 95% | 0 | 115 |
-| classify_v3 | 20/20 | 100% | 0 | 312 |
-| classify_v4 | 20/20 | 100% | 0 | 365 |
+| classify_v1 | 12/20 | 60% | 0 | 112 |
+| classify_v2 | 20/20 | 100% | 0 | 276 |
+| classify_v3 | 20/20 | 100% | 0 | 399 |
+| classify_v4 | 20/20 | 100% | 0 | 406 |
 
 <!-- prompts:end -->
 
 ### Router prompt: which version won
-- classify_v3 and classify_v4 reached 100% accuracy on the 20-question test set (10 docs, 5 personal, 5 off_topic).
-- classify_v1 only achieved 85% (17/20), misclassifying live production database queries ("Why is our production database slow right now?") as `docs` because it lacked boundary definitions between static engine documentation and runtime server telemetry. It also fell victim to prompt injection ("Ignore all previous instructions...").
-- classify_v2 improved to 95% (19/20) by establishing definitions for live system state and private connection strings, but classify_v3 sealed 100% (20/20) with few-shot examples clearly anchoring prompt injection attempts to `off_topic` and runtime questions to `personal`.
-- Token comparison: classify_v3 used 312 tokens in versus 54 for v1 and 115 for v2. The additional ~200 tokens cost less than Rs 0.002 per call, which is completely worth paying to ensure 100% routing fidelity and prevent leaking or hallucinating on personal/out-of-scope queries.
+- `classify_v2`, `classify_v3`, and `classify_v4` all reached 100% (`20/20`) accuracy on the 20-question test set (10 `docs`, 5 `personal`, 5 `off_topic`), with 0 invalid replies.
+- `classify_v1` only achieved 60% (`12/20`), missing lines 6, 13, and 20 (`personal` misclassified as `docs`), lines 15 and 18 (`off_topic` misclassified as `personal`), and lines 16, 17, and 19 (`off_topic` misclassified as `docs`, including the prompt injection on line 19).
+- `classify_v2` jumped to 100% (`20/20`) by adding clear definitions for `docs` vs `personal` vs `off_topic` and wrapping user input in `<question>` tags. `classify_v3` added 6 domain examples and `classify_v4` tightened the `personal` telemetry wording and output rule; both maintained `20/20`.
+- Token comparison: `classify_v1` averaged 112 input tokens, `classify_v2` 276, `classify_v3` 399, and `classify_v4` 406. Paying +164 tokens (`classify_v2` vs `v1`) to go from 60% to 100% accuracy is well worth it; `classify_v2` is the most token-efficient 100% prompt, while `classify_v3` adds few-shot anchoring.
+- Label changes after seeing results: none (all 20 labels held up).
 
 ### DocMeta contract: tailored for QueryDoctor
 - **Fields kept:** `doc_kind`, `year`, `language`, `summary`, `topics`.
@@ -285,12 +286,10 @@ Smoke test passed
 
 ### Metadata extraction run
 - Filtered extraction on documents in Postgres using `prompts/extract_v1.md` and `DocMeta`.
-- Parsed documents: 10 HTML core docs + 429 SGML chapters.
+- Parsed documents: 10 HTML core docs + 429 SGML chapters (resumable via `scripts/extract_metadata.py`; remaining documents continue on re-run without repeating completed ones).
 - Extraction trial (5 documents):
-  - OK on first attempt: 4
-  - Repaired via validation-retry loop: 1 (initial output returned markdown backticks which were repaired on retry)
-  - Failed after 3 attempts: 0
-  - Average cost per document: Rs 0.018
+  - `prompt=extract_v1 pending=5 ok=5 repaired=0 failed=0 tokens_in=4383 tokens_out=3209 cost=Rs 0.1227 seconds=55` (~Rs 0.0245 per document).
+- Followed up with a 50-document batch (`scripts/extract_metadata.py --limit 50 --rpm 25`) and verified filtered results on the live URL (`/v1/documents?doc_kind=reference`).
 
 ### One thing that went wrong today, and how I fixed it
   The model initially returned Markdown fences (```json ... ```) and minor schema deviations for list constraints on short text fields; fixed by wrapping `DocMeta` schema validation in an automated validation-retry loop (`extract.py`) that feeds back the specific Pydantic ValidationError message directly into the model prompt, correcting invalid replies on the second attempt.
