@@ -294,3 +294,14 @@ Smoke test passed
 
 ### One thing that went wrong today, and how I fixed it
   The model initially returned Markdown fences (```json ... ```) and minor schema deviations for list constraints on short text fields; fixed by wrapping `DocMeta` schema validation in an automated validation-retry loop (`extract.py`) that feeds back the specific Pydantic ValidationError message directly into the model prompt, correcting invalid replies on the second attempt.
+
+
+## D10 · Queue and worker
+- `arq` (`0.28.0`) added with `redis` and `hiredis`; `ingest_jobs` and `ingest_items` tables migrated to Neon (`405d08bb4bd2_add_ingest_jobs_and_ingest_items.py`).
+- `POST /v1/ingest` (protected by `X-Admin-Token`), `GET /v1/ingest/{job_id}`, and `GET /v1/ingest/dead-letter` wired with lazy Redis connection so `/health` and `/v1/chat` keep working even when Redis is unreachable.
+- Idempotency & crash recovery: `Queue.put` uses `_job_id=f"ingest:{item_id}"` to prevent duplicate queueing, `process()` checks `Document.external_id` by SHA-256 hash before parsing/extracting, and `startup()` re-queues any `queued`/`running` items from Postgres if Redis restarts.
+- Week 2 against Monday's estimate:
+  - `docs/CAPACITY.md` said: 4,166 pages, 3,124,400 tokens. `docs/INGEST_REPORT.md` says: 4,873 pages, 2,794,923 tokens.
+  - The difference: HTML boilerplate and SGML markup were stripped during Day 7 parsing, reducing raw token count by ~10% while splitting long chapters into slightly more pages.
+- One thing that went wrong today, and how I fixed it:
+  `tests/unit/conftest.py` took precedence over `tests/conftest.py` in pytest, so adding `FakeQueue` and `FakeIngestRepo` only to `tests/conftest.py` would miss unit tests; mirrored the overrides and `admin_token` in `tests/unit/conftest.py` so all 126 unit tests pass.
