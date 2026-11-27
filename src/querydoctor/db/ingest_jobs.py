@@ -95,3 +95,17 @@ class IngestRepository:
         """Items that should be in the queue. Used to queue them again after Redis lost them."""
         stmt = select(IngestItem.id).where(IngestItem.status.in_(OPEN)).order_by(IngestItem.id)
         return list(await self.session.scalars(stmt))
+
+    async def stats(self) -> dict:
+        """Queue health: item counts by status across all jobs, and oldest queued age in s."""
+        rows = await self.session.execute(
+            select(IngestItem.status, func.count()).group_by(IngestItem.status)
+        )
+        counts = {"queued": 0, "running": 0, "done": 0, "skipped": 0, "failed": 0}
+        for status, count in rows:
+            counts[status] = int(count)
+        oldest = await self.session.scalar(
+            select(func.min(IngestItem.updated_at)).where(IngestItem.status == "queued")
+        )
+        age = round((datetime.now(UTC) - oldest).total_seconds(), 1) if oldest else 0.0
+        return {"counts": counts, "oldest_queued_seconds": max(0.0, age)}

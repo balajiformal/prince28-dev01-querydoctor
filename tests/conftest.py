@@ -129,6 +129,19 @@ class FakeIngestRepo:
     async def failed_records(self):
         return [{"url": item["url"], "path": item["path"]} for item in self.failed]
 
+    async def stats(self):
+        queued = sum(len(items) for items in self.jobs.values())
+        return {
+            "counts": {
+                "queued": queued,
+                "running": 0,
+                "done": 0,
+                "skipped": 0,
+                "failed": len(self.failed),
+            },
+            "oldest_queued_seconds": 12.5 if queued else 0.0,
+        }
+
 
 def manifest_line(n: int, **changes) -> dict:
     record = {
