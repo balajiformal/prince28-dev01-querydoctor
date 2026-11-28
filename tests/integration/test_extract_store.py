@@ -27,6 +27,7 @@ async def test_extract_metadata_stored_in_postgres(session):
         external_id="test_doc_001",
         doc_type="html",
         title="Using EXPLAIN",
+        sha256="0" * 64,
         metadata_={"source": "postgres-docs", "pages": 1},
     )
     session.add(doc)

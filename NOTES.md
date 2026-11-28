@@ -297,12 +297,25 @@ Smoke test passed
 
 
 ## D10 · Queue and worker
-- `arq` (`0.28.0`) added with `redis` and `hiredis`; `ingest_jobs` and `ingest_items` tables migrated to Neon (`405d08bb4bd2_add_ingest_jobs_and_ingest_items.py`).
-- `POST /v1/ingest` (protected by `X-Admin-Token`), `GET /v1/ingest/{job_id}`, and `GET /v1/ingest/dead-letter` wired with lazy Redis connection so `/health` and `/v1/chat` keep working even when Redis is unreachable.
-- Idempotency & crash recovery: `Queue.put` uses `_job_id=f"ingest:{item_id}"` to prevent duplicate queueing, `process()` checks `Document.external_id` by SHA-256 hash before parsing/extracting, and `startup()` re-queues any `queued`/`running` items from Postgres if Redis restarts.
-- Week 2 against Monday's estimate:
-  - `docs/CAPACITY.md` said: 4,166 pages, 3,124,400 tokens. `docs/INGEST_REPORT.md` says: 4,873 pages, 2,794,923 tokens.
-  - The difference: HTML boilerplate and SGML markup were stripped during Day 7 parsing, reducing raw token count by ~10% while splitting long chapters into slightly more pages.
+- First run (`job 313bbb22898c4e9fadb599fa81a31a76`): 10 documents queued; Done 9, skipped 0, failed 1 (rate-limit `gave up after 3 tries`).
+- Pace: ~5 s per document (`INGEST_RPM = 12.0`, `INGEST_CONCURRENCY = 2`).
+
+### Kill test
+- Queued: 20 (`job 762e5beaa67a4df6af8a63555df81afd`). At the kill (49 s): queued 15, running 2, done 3, failed 0.
+- After the new worker: done 20 + skipped 0 + failed 0 = 20 (finished in 444 s, 303 pages).
+- Documents in the database: 444, different ids: 444.
+- The interrupted items came back after ~60–120 s (after the `ingest_job_timeout = 60` visibility lock expired) and completed on retry (`most_tries` up to 2–3).
+- Why nothing was doubled: Every job hashes the file content (`sha256`), checks `Document.external_id` in Postgres before parsing or extracting, and uses `_job_id=f"ingest:{item_id}"` in Redis so duplicate deliveries are skipped.
+
+### Dead-letter list
+| Stage (parse / extract / download / gave up) | Items | What I did |
+|---|---|---|
+| gave up after 3 tries | 1 | Rate-limit (`LLMUnavailable`) during the first 10-doc run; left on the dead-letter list for `--retry-failed`. |
+
+### Week 2 against Monday's estimate
+- `docs/CAPACITY.md` said: 4,166 pages, 3,124,400 tokens. `docs/INGEST_REPORT.md` says: 4,827 pages, 2,769,076 tokens (444 documents, 84 extracted, 2 ingest jobs started, 29 items done, 10 retried, 1 dead-letter).
+- The difference: HTML boilerplate and SGML markup were stripped during Day 7 parsing, reducing raw token count by ~11% while splitting long chapters into slightly more pages.
+- `POST /v1/ingest` (protected by `X-Admin-Token`), `GET /v1/ingest/{job_id}`, `GET /v1/ingest/dead-letter`, and `GET /v1/ingest/stats` wired with lazy Redis connection so `/health` stays 200 even when Redis or the worker is down.
 - One thing that went wrong today, and how I fixed it:
   `tests/unit/conftest.py` took precedence over `tests/conftest.py` in pytest, so adding `FakeQueue` and `FakeIngestRepo` only to `tests/conftest.py` would miss unit tests; mirrored the overrides and `admin_token` in `tests/unit/conftest.py` so all 128 unit tests pass.
 - Queue health endpoint (`GET /v1/ingest/stats`): added `IngestRepository.stats()` and `GET /v1/ingest/stats` returning status counts across all jobs and `oldest_queued_seconds`, covered by 2 unit tests (`test_ingest_stats_when_queue_is_empty`, `test_ingest_stats_reports_counts_and_oldest_queued_age`).

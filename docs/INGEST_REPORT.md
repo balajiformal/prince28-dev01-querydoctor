@@ -1,25 +1,29 @@
 # Ingestion report
 
 <!-- generated:start -->
-_Generated 27 Nov 2026 15:02 from the database._
+_Generated 28 Nov 2026 15:24 from the database._
 
 | What | Count |
 |---|---|
-| Documents in the database | 449 |
-| Pages | 4873 |
-| Tokens of text (characters ÷ 4) | 2,794,923 |
+| Documents in the database | 444 |
+| Pages | 4827 |
+| Tokens of text (characters ÷ 4) | 2,769,076 |
 | Files the parser gave up on | 0 |
-| Documents with an extracted record | 55 |
+| Documents with an extracted record | 84 |
 | Documents whose extraction failed | 0 |
 
 | Queue | Count |
 |---|---|
-| Ingest jobs started | 0 |
-| Items finished (done or skipped) | 0 |
-| Items that needed more than one try | 0 |
-| Items in the dead-letter list | 0 |
+| Ingest jobs started | 2 |
+| Items finished (done or skipped) | 29 |
+| Items that needed more than one try | 10 |
+| Items in the dead-letter list | 1 |
 
-Model calls for extraction: 82 · tokens in 93,649 · tokens out 36,481 · cost at list price Rs 1.71
+Model calls for extraction: 145 · tokens in 163,405 · tokens out 55,986 · cost at list price Rs 2.76
+
+Last job `762e5beaa67a4df6af8a63555df81afd`: 20 requested, 20 ok, 0 failed, 7.4 minutes.
+
+Dead-letter list by stage: gave up after 3 tries 1
 <!-- generated:end -->
 
 ## What I learnt
